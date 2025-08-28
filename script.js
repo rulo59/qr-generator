@@ -5,10 +5,12 @@ class QRGenerator {
         this.generateBtn = document.getElementById('generate-btn');
         this.clearBtn = document.getElementById('clear-btn');
         this.downloadAllBtn = document.getElementById('download-all-btn');
+        this.printBtn = document.getElementById('print-btn');
         this.qrSizeSelect = document.getElementById('qr-size');
         this.qrColorInput = document.getElementById('qr-color');
         this.qrBgColorInput = document.getElementById('qr-bg-color');
         this.loadingDiv = document.getElementById('loading');
+        this.printContainer = document.getElementById('print-container');
         
         this.qrCodes = [];
         this.initEventListeners();
@@ -18,6 +20,7 @@ class QRGenerator {
         this.generateBtn.addEventListener('click', () => this.generateQRCodes());
         this.clearBtn.addEventListener('click', () => this.clearAll());
         this.downloadAllBtn.addEventListener('click', () => this.downloadAll());
+        this.printBtn.addEventListener('click', () => this.printQRCodes());
     }
 
     showLoading() {
@@ -84,6 +87,7 @@ class QRGenerator {
             }
             
             this.downloadAllBtn.disabled = false;
+            this.printBtn.disabled = false;
         } catch (error) {
             console.error('Error generando códigos QR:', error);
             alert('Hubo un error generando los códigos QR. Por favor, inténtalo de nuevo.');
@@ -241,8 +245,89 @@ class QRGenerator {
     clearAll() {
         this.linksInput.value = '';
         this.qrContainer.innerHTML = '';
+        this.printContainer.innerHTML = '';
         this.qrCodes = [];
         this.downloadAllBtn.disabled = true;
+        this.printBtn.disabled = true;
+    }
+
+    async printQRCodes() {
+        if (this.qrCodes.length === 0) {
+            alert('No hay códigos QR para imprimir.');
+            return;
+        }
+
+        try {
+            // Limpiar el contenedor de impresión
+            this.printContainer.innerHTML = '';
+
+            // Crear la estructura para impresión
+            await this.createPrintLayout();
+
+            // Ocultar el contenido principal y mostrar el de impresión
+            document.body.classList.add('printing');
+            this.printContainer.style.display = 'block';
+            
+            // Ocultar elementos que no se deben imprimir
+            document.querySelector('.container').classList.add('no-print');
+
+            // Imprimir
+            window.print();
+
+            // Restaurar la vista normal después de imprimir
+            setTimeout(() => {
+                document.body.classList.remove('printing');
+                this.printContainer.style.display = 'none';
+                document.querySelector('.container').classList.remove('no-print');
+            }, 1000);
+
+        } catch (error) {
+            console.error('Error preparando la impresión:', error);
+            alert('Hubo un error preparando la impresión. Por favor, inténtalo de nuevo.');
+        }
+    }
+
+    async createPrintLayout() {
+        const qrPerPage = 3; // 3 códigos QR por página
+        
+        for (let i = 0; i < this.qrCodes.length; i += qrPerPage) {
+            // Crear una nueva página
+            const printPage = document.createElement('div');
+            printPage.className = 'print-page';
+
+            // Agregar hasta 3 QR en esta página
+            for (let j = 0; j < qrPerPage && (i + j) < this.qrCodes.length; j++) {
+                const qrData = this.qrCodes[i + j];
+                
+                const qrItem = document.createElement('div');
+                qrItem.className = 'qr-print-item';
+
+                // Título
+                const title = document.createElement('div');
+                title.className = 'qr-print-title';
+                title.textContent = `Código QR #${qrData.index}`;
+
+                // QR Code (clonar el canvas existente)
+                const qrCodeContainer = document.createElement('div');
+                qrCodeContainer.className = 'qr-print-code';
+                const clonedCanvas = qrData.canvas.cloneNode(true);
+                qrCodeContainer.appendChild(clonedCanvas);
+
+                // URL
+                const urlElement = document.createElement('div');
+                urlElement.className = 'qr-print-url';
+                urlElement.textContent = qrData.url;
+
+                // Ensamblar el elemento
+                qrItem.appendChild(title);
+                qrItem.appendChild(qrCodeContainer);
+                qrItem.appendChild(urlElement);
+                
+                printPage.appendChild(qrItem);
+            }
+
+            this.printContainer.appendChild(printPage);
+        }
     }
 }
 

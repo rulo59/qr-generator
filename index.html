@@ -23,6 +23,81 @@
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📱</text></svg>">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <style>
+        @media print {
+            body {
+                background: white !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+                margin: 0;
+                padding: 0;
+            }
+            
+            .no-print {
+                display: none !important;
+            }
+            
+            .print-page {
+                page-break-after: always;
+                margin: 0;
+                padding: 20px;
+                width: 100%;
+                display: flex;
+                flex-direction: column;
+                justify-content: space-around;
+                min-height: 100vh;
+            }
+            
+            .print-page:last-child {
+                page-break-after: auto;
+            }
+            
+            .qr-print-item {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                margin-bottom: 30px;
+                page-break-inside: avoid;
+                border-bottom: 1px dashed #ccc;
+                padding-bottom: 20px;
+            }
+            
+            .qr-print-item:last-child {
+                border-bottom: none;
+                margin-bottom: 0;
+            }
+            
+            .qr-print-title {
+                font-size: 16px;
+                font-weight: bold;
+                margin-bottom: 10px;
+                text-align: center;
+            }
+            
+            .qr-print-code {
+                margin-bottom: 10px;
+            }
+            
+            .qr-print-code canvas,
+            .qr-print-code img {
+                max-width: 200px;
+                max-height: 200px;
+            }
+            
+            .qr-print-url {
+                font-size: 11px;
+                word-break: break-all;
+                text-align: center;
+                max-width: 300px;
+                line-height: 1.3;
+                color: #333;
+            }
+        }
+        
+        .print-container {
+            display: none;
+        }
+    </style>
 </head>
 <body class="bg-gray-100 min-h-screen py-8">
     <div class="container mx-auto px-4 max-w-4xl">
@@ -46,7 +121,7 @@ https://ejemplo1.com
 https://ejemplo2.com"></textarea>
             </div>
             
-            <div class="flex flex-col sm:flex-row gap-4 mb-6">
+            <div class="flex flex-col sm:flex-row gap-4 mb-4">
                 <button 
                     id="generate-btn" 
                     class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md transition duration-200 ease-in-out transform hover:scale-105">
@@ -62,6 +137,15 @@ https://ejemplo2.com"></textarea>
                     class="flex-1 bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-md transition duration-200 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed" 
                     disabled>
                     Descargar Todos
+                </button>
+            </div>
+
+            <div class="flex justify-center mb-6">
+                <button 
+                    id="print-btn" 
+                    class="bg-purple-600 hover:bg-purple-700 text-white font-medium py-3 px-8 rounded-md transition duration-200 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105 shadow-lg" 
+                    disabled>
+                    🖨️ Imprimir Códigos QR
                 </button>
             </div>
 
@@ -109,6 +193,11 @@ https://ejemplo2.com"></textarea>
                 </div>
             </div>
         </div>
+    </div>
+
+    <!-- Contenedor oculto para impresión -->
+    <div id="print-container" class="print-container">
+        <!-- Los QR para imprimir se generarán aquí -->
     </div>
 
     <script src="script.js"></script>
