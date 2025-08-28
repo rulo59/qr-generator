@@ -288,14 +288,14 @@ class QRGenerator {
     }
 
     async createPrintLayout() {
-        const qrPerPage = 4; // 4 códigos QR por página (2x2)
+        const qrPerPage = 6; // 6 códigos QR por página (2x3)
         
         for (let i = 0; i < this.qrCodes.length; i += qrPerPage) {
             // Crear una nueva página
             const printPage = document.createElement('div');
             printPage.className = 'print-page';
 
-            // Agregar hasta 4 QR en esta página
+            // Agregar hasta 6 QR en esta página
             for (let j = 0; j < qrPerPage && (i + j) < this.qrCodes.length; j++) {
                 const qrData = this.qrCodes[i + j];
                 
@@ -314,8 +314,8 @@ class QRGenerator {
                 // Convertir canvas a imagen para mejor compatibilidad de impresión
                 const img = document.createElement('img');
                 img.src = qrData.canvas.toDataURL('image/png');
-                img.style.width = '150px';
-                img.style.height = '150px';
+                img.style.width = '130px';
+                img.style.height = '130px';
                 img.style.border = 'none';
                 qrCodeContainer.appendChild(img);
 

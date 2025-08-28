@@ -40,11 +40,11 @@
             .print-page {
                 page-break-after: always;
                 margin: 0;
-                padding: 15px;
+                padding: 10px;
                 width: 100%;
                 display: grid;
                 grid-template-columns: 1fr 1fr;
-                grid-gap: 20px;
+                grid-gap: 15px;
                 min-height: 100vh;
                 align-content: start;
             }
@@ -57,41 +57,41 @@
                 display: flex;
                 flex-direction: column;
                 align-items: center;
-                padding: 15px;
+                padding: 10px;
                 border: 1px solid #ddd;
-                border-radius: 8px;
+                border-radius: 6px;
                 page-break-inside: avoid;
                 background: white;
             }
             
             .qr-print-title {
-                font-size: 14px;
+                font-size: 13px;
                 font-weight: bold;
-                margin-bottom: 10px;
+                margin-bottom: 8px;
                 text-align: center;
                 color: #333;
             }
             
             .qr-print-code {
-                margin-bottom: 10px;
+                margin-bottom: 8px;
                 display: flex;
                 justify-content: center;
             }
             
             .qr-print-code canvas,
             .qr-print-code img {
-                width: 150px !important;
-                height: 150px !important;
+                width: 130px !important;
+                height: 130px !important;
                 border: none !important;
                 background: white !important;
             }
             
             .qr-print-url {
-                font-size: 9px;
+                font-size: 8px;
                 word-break: break-all;
                 text-align: center;
-                max-width: 180px;
-                line-height: 1.2;
+                max-width: 150px;
+                line-height: 1.1;
                 color: #666;
             }
         }
