@@ -1,101 +1,76 @@
-# Generador de Códigos QR
+# 🔗 QR Code Generator
 
-Una aplicación web simple para generar códigos QR a partir de enlaces, especialmente diseñada para enlaces de Google Drive.
+🚀 **[Acceder a la aplicación](https://rulo59.github.io/qr-generator/)**
 
-## 🚀 Características
+Una aplicación web moderna y responsive para generar códigos QR a partir de enlaces. Perfecta para convertir enlaces de Google Drive y cualquier URL en códigos QR descargables.
 
-- **Interfaz intuitiva**: Diseño limpio y moderno con Tailwind CSS
-- **Múltiples enlaces**: Genera códigos QR para varios enlaces a la vez
-- **Personalización**: Configura el tamaño y colores de los códigos QR
-- **Descarga individual**: Descarga cada código QR por separado
-- **Descarga masiva**: Descarga todos los códigos QR de una vez
-- **Validación de URLs**: Verifica que los enlaces sean válidos antes de generar los QR
-- **Responsive**: Funciona perfectamente en dispositivos móviles y escritorio
+![QR Generator](https://img.shields.io/badge/Status-Online-brightgreen)
+![No Dependencies](https://img.shields.io/badge/Dependencies-None-blue)
+![Mobile Friendly](https://img.shields.io/badge/Mobile-Friendly-green)
 
-## 📱 Cómo usar
+## ✨ Características
 
-1. **Abrir la aplicación**: Abre el archivo `index.html` en tu navegador
-2. **Ingresar enlaces**: Pega los enlaces en el área de texto 
-   - Puedes separarlos por líneas nuevas (uno por línea)
-   - O separarlos por comas en la misma línea
-   - O una combinación de ambos métodos
-3. **Configurar opciones** (opcional):
-   - Selecciona el tamaño del QR (200x200 a 500x500 píxeles)
-   - Elige el color del QR
-   - Elige el color de fondo
-4. **Generar**: Haz clic en "Generar Códigos QR"
-5. **Descargar**: 
-   - Descarga códigos individuales con el botón de cada QR
-   - Descarga todos con "Descargar Todos"
+- 🎯 **Entrada flexible**: Enlaces separados por líneas nuevas, comas, o ambos
+- ✅ **Validación automática**: Solo procesa URLs válidas  
+- 🎨 **Personalización**: Tamaño y colores personalizables
+- 💾 **Descarga múltiple**: Individual o masiva en PNG
+- 📱 **Responsive**: Optimizado para móviles y escritorio
+- ⚡ **Sin instalación**: Funciona directamente en el navegador
 
-## 🔗 Ejemplo de enlaces soportados
+## � Uso Rápido
 
-**Separados por líneas nuevas:**
+**[👉 Abrir Aplicación](https://rulo59.github.io/qr-generator/)**
+
+1. Pega tus enlaces (uno por línea o separados por comas)
+2. Personaliza tamaño y colores (opcional)
+3. Haz clic en "Generar Códigos QR"
+4. Descarga los QR individual o masivamente
+
+### Ejemplos de entrada:
+
+**Por líneas:**
 ```
 https://drive.google.com/file/d/19FgrGSaiBs6tko4OuzR3lqIUMw399n2j/view?usp=drive_link
-https://drive.google.com/file/d/1KAORB9c41u56I_8svftZj2KzSL5RiuGA/view?usp=drive_link
-https://www.ejemplo.com
+https://ejemplo.com
+https://github.com/usuario/repo
 ```
 
-**Separados por comas:**
+**Por comas:**
 ```
-https://drive.google.com/file/d/19FgrGSaiBs6tko4OuzR3lqIUMw399n2j/view?usp=drive_link, https://www.ejemplo.com, https://github.com/usuario/repositorio
-```
-
-**Combinación de ambos:**
-```
-https://drive.google.com/file/d/19FgrGSaiBs6tko4OuzR3lqIUMw399n2j/view?usp=drive_link, https://www.ejemplo.com
-https://github.com/usuario/repositorio
+https://enlace1.com, https://enlace2.com, https://enlace3.com
 ```
 
-## 🛠️ Tecnologías utilizadas
-
-- **HTML5**: Estructura de la aplicación
-- **JavaScript (ES6+)**: Lógica de la aplicación
-- **Tailwind CSS**: Estilos y diseño responsive
-- **QRCode.js**: Librería para generar códigos QR
-
-## 📂 Estructura del proyecto
-
+**Mixto:**
 ```
-create-qr/
-├── index.html      # Página principal
-├── script.js       # Lógica de la aplicación
-└── README.md       # Documentación
+https://enlace1.com, https://enlace2.com
+https://enlace3.com
 ```
 
-## 🌟 Características adicionales
+## 🛠️ Tecnologías
 
-- **Validación automática**: Solo acepta URLs válidas
-- **Feedback visual**: Indicadores de carga y confirmaciones
-- **Truncado de URLs**: Muestra URLs largas de forma legible
-- **Gestión de errores**: Manejo elegante de errores de generación
-
-## 🔧 Personalización
-
-Puedes personalizar fácilmente:
-
-- **Tamaños de QR**: Modifica las opciones en el select `qr-size`
-- **Colores predeterminados**: Cambia los valores por defecto en los inputs de color
-- **Estilos**: Modifica las clases de Tailwind CSS según tus preferencias
+- HTML5 + JavaScript ES6+
+- Tailwind CSS para estilos
+- QRCode.js para generación de QR
+- GitHub Pages para hosting
 
 ## 📱 Compatibilidad
 
-- ✅ Chrome 60+
-- ✅ Firefox 55+
-- ✅ Safari 12+
-- ✅ Edge 79+
+✅ Chrome, Firefox, Safari, Edge  
+✅ iOS Safari, Chrome Mobile  
+✅ No requiere instalación
 
-## 🚀 Despliegue
+## � Desarrollo Local
 
-Para usar la aplicación:
-
-1. Descarga todos los archivos
-2. Abre `index.html` en cualquier navegador moderno
-3. ¡Listo para usar!
-
-No requiere servidor web, funciona completamente en el cliente.
+```bash
+git clone https://github.com/rulo59/qr-generator.git
+cd qr-generator
+# Abrir index.html en navegador
+```
 
 ## 📄 Licencia
 
-Este proyecto es de código abierto y está disponible bajo la licencia MIT.
+MIT License - Uso libre y gratuito
+
+---
+
+**[🌐 Acceder a la Aplicación](https://rulo59.github.io/qr-generator/)** | **[📱 Versión Móvil](https://rulo59.github.io/qr-generator/)**
