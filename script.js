@@ -288,7 +288,7 @@ class QRGenerator {
     }
 
     async createPrintLayout() {
-        const qrPerPage = 6; // 6 códigos QR por página (2x3)
+        const qrPerPage = 8; // 6 códigos QR por página (2x3)
         
         for (let i = 0; i < this.qrCodes.length; i += qrPerPage) {
             // Crear una nueva página
