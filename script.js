@@ -103,7 +103,7 @@ function generateQRCode(links) {
             
             // Create buttons container
             const buttonsDiv = document.createElement('div');
-            buttonsDiv.className = 'flex gap-2 w-full flex-col';
+            buttonsDiv.className = 'flex flex-col gap-2 w-full';
             
             // First row: PNG and SVG downloads
             const downloadRow = document.createElement('div');
@@ -290,20 +290,29 @@ async function downloadAllQRCodes() {
         const colorLight = document.getElementById('qr-bg-color').value;
         
         // Add each QR code as both PNG and SVG
+        let skippedCount = 0;
         for (let i = 0; i < generatedQRCodes.length; i++) {
             const qr = generatedQRCodes[i];
             const qrDiv = document.getElementById(`qr-${qr.index}`);
-            const canvas = qrDiv.querySelector('canvas');
+            const canvas = qrDiv ? qrDiv.querySelector('canvas') : null;
             
             if (canvas) {
-                // Add PNG version
-                const pngData = canvas.toDataURL('image/png').split(',')[1]; // Remove data:image/png;base64, prefix
+                // Add PNG version - extract base64 data by removing the data URL prefix
+                const pngData = canvas.toDataURL('image/png').split(',')[1];
                 zip.file(`qr-code-${i + 1}.png`, pngData, { base64: true });
                 
                 // Add SVG version
                 const svgContent = generateSVGQRCode(qr.link, size, colorDark, colorLight);
                 zip.file(`qr-code-${i + 1}.svg`, svgContent);
+            } else {
+                console.warn(`Canvas not found for QR code ${i + 1}, skipping`);
+                skippedCount++;
             }
+        }
+        
+        // Show warning if some QR codes were skipped
+        if (skippedCount > 0) {
+            console.warn(`${skippedCount} QR code(s) were skipped due to missing canvas`);
         }
         
         // Generate and download the ZIP file
