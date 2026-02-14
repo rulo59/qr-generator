@@ -103,21 +103,27 @@ function generateQRCode(links) {
             
             // Create buttons container
             const buttonsDiv = document.createElement('div');
-            buttonsDiv.className = 'flex gap-2 w-full';
+            buttonsDiv.className = 'flex flex-col gap-2 w-full';
             
-            // Download button
-            const downloadBtn = document.createElement('button');
-            downloadBtn.className = 'flex-1 bg-green-600 hover:bg-green-700 text-white text-sm py-2 px-3 rounded transition';
-            downloadBtn.innerHTML = '⬇️ Descargar';
-            downloadBtn.onclick = () => downloadQRCode(index);
-            buttonsDiv.appendChild(downloadBtn);
+            // First row: PNG and SVG downloads
+            const downloadRow = document.createElement('div');
+            downloadRow.className = 'flex gap-2';
             
-            // Copy button
-            const copyBtn = document.createElement('button');
-            copyBtn.className = 'flex-1 bg-blue-600 hover:bg-blue-700 text-white text-sm py-2 px-3 rounded transition';
-            copyBtn.innerHTML = '📋 Copiar';
-            copyBtn.onclick = () => copyQRCode(index);
-            buttonsDiv.appendChild(copyBtn);
+            // Download PNG button
+            const downloadPngBtn = document.createElement('button');
+            downloadPngBtn.className = 'flex-1 bg-green-600 hover:bg-green-700 text-white text-sm py-2 px-3 rounded transition';
+            downloadPngBtn.innerHTML = '📥 PNG';
+            downloadPngBtn.onclick = () => downloadQRCode(index, 'png');
+            downloadRow.appendChild(downloadPngBtn);
+            
+            // Download SVG button
+            const downloadSvgBtn = document.createElement('button');
+            downloadSvgBtn.className = 'flex-1 bg-blue-600 hover:bg-blue-700 text-white text-sm py-2 px-3 rounded transition';
+            downloadSvgBtn.innerHTML = '📥 SVG';
+            downloadSvgBtn.onclick = () => downloadQRCode(index, 'svg');
+            downloadRow.appendChild(downloadSvgBtn);
+            
+            buttonsDiv.appendChild(downloadRow);
             
             qrItem.appendChild(buttonsDiv);
             container.appendChild(qrItem);
@@ -158,8 +164,8 @@ function generateQRCode(links) {
     }, LOADING_DISPLAY_DELAY_MS);
 }
 
-// Function to download individual QR code as PNG
-function downloadQRCode(index) {
+// Function to download individual QR code as PNG or SVG
+function downloadQRCode(index, format = 'png') {
     const qrDiv = document.getElementById(`qr-${index}`);
     if (!qrDiv) return;
     
@@ -171,82 +177,169 @@ function downloadQRCode(index) {
             return;
         }
         
-        // Convert canvas to data URL
-        const dataURL = canvas.toDataURL('image/png');
-        
-        // Create download link
-        const link = document.createElement('a');
-        link.download = `qr-code-${index + 1}.png`;
-        link.href = dataURL;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        
-        // Show feedback
-        showTemporaryMessage('QR descargado correctamente', 'success');
+        if (format === 'png') {
+            // Convert canvas to data URL
+            const dataURL = canvas.toDataURL('image/png');
+            
+            // Create download link
+            const link = document.createElement('a');
+            link.download = `qr-code-${index + 1}.png`;
+            link.href = dataURL;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            // Show feedback
+            showTemporaryMessage('QR PNG descargado correctamente', 'success');
+        } else if (format === 'svg') {
+            // Generate SVG from QR data
+            const qrData = generatedQRCodes.find(qr => qr.index === index);
+            if (!qrData) {
+                alert('Error: No se encontró la información del QR');
+                return;
+            }
+            
+            const size = parseInt(document.getElementById('qr-size').value);
+            const colorDark = document.getElementById('qr-color').value;
+            const colorLight = document.getElementById('qr-bg-color').value;
+            
+            // Generate SVG QR code
+            const svgQR = generateSVGQRCode(qrData.link, size, colorDark, colorLight);
+            
+            // Create blob and download
+            const blob = new Blob([svgQR], { type: 'image/svg+xml' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.download = `qr-code-${index + 1}.svg`;
+            link.href = url;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+            
+            // Show feedback
+            showTemporaryMessage('QR SVG descargado correctamente', 'success');
+        }
     } catch (error) {
         console.error('Error al descargar QR:', error);
         alert('Error al descargar el código QR');
     }
 }
 
-// Function to copy QR code to clipboard
-async function copyQRCode(index) {
-    const qrDiv = document.getElementById(`qr-${index}`);
-    if (!qrDiv) return;
-    
+// Function to generate SVG QR code
+function generateSVGQRCode(text, size, colorDark, colorLight) {
     try {
-        const canvas = qrDiv.querySelector('canvas');
-        if (!canvas) {
-            alert('Error: No se pudo obtener el código QR');
-            return;
+        // Using QRCode library's internal qrcode function for SVG generation
+        if (typeof qrcode === 'undefined') {
+            throw new Error('qrcode function not available');
         }
         
-        // Convert canvas to blob
-        canvas.toBlob(async (blob) => {
-            try {
-                // Try to use Clipboard API with ClipboardItem
-                if (navigator.clipboard && window.ClipboardItem) {
-                    const item = new ClipboardItem({ 'image/png': blob });
-                    await navigator.clipboard.write([item]);
-                    showTemporaryMessage('QR copiado al portapapeles', 'success');
-                } else {
-                    // Fallback: copy data URL as text
-                    const dataURL = canvas.toDataURL('image/png');
-                    await navigator.clipboard.writeText(dataURL);
-                    showTemporaryMessage('URL del QR copiada al portapapeles', 'success');
+        const qr = qrcode(0, 'H');
+        qr.addData(text);
+        qr.make();
+        
+        const moduleCount = qr.getModuleCount();
+        const cellSize = size / moduleCount;
+        
+        let svg = `<?xml version="1.0" encoding="UTF-8"?>`;
+        svg += `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">`;
+        svg += `<rect width="${size}" height="${size}" fill="${colorLight}"/>`;
+        
+        for (let row = 0; row < moduleCount; row++) {
+            for (let col = 0; col < moduleCount; col++) {
+                if (qr.isDark(row, col)) {
+                    const x = col * cellSize;
+                    const y = row * cellSize;
+                    svg += `<rect x="${x}" y="${y}" width="${cellSize}" height="${cellSize}" fill="${colorDark}"/>`;
                 }
-            } catch (err) {
-                console.error('Error al copiar:', err);
-                // Final fallback: show message with instructions
-                alert('No se pudo copiar automáticamente. Por favor, haz clic derecho en el QR y selecciona "Copiar imagen"');
             }
-        }, 'image/png');
+        }
+        
+        svg += '</svg>';
+        return svg;
     } catch (error) {
-        console.error('Error al copiar QR:', error);
-        alert('Error al copiar el código QR');
+        console.error('Error generating SVG QR code:', error);
+        // Fallback: create a simple SVG with error message
+        return `<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
+    <rect width="${size}" height="${size}" fill="${colorLight}"/>
+    <text x="50%" y="50%" text-anchor="middle" font-size="12" fill="red">Error generando SVG</text>
+</svg>`;
     }
 }
 
-// Function to download all QR codes
-function downloadAllQRCodes() {
+// Function to download all QR codes as ZIP
+async function downloadAllQRCodes() {
     if (generatedQRCodes.length === 0) {
         alert('No hay códigos QR para descargar');
         return;
     }
     
+    // Check if JSZip is available
+    if (typeof JSZip === 'undefined') {
+        alert('Error: JSZip no está cargado. Por favor recarga la página.');
+        return;
+    }
+    
     showLoading(true);
     
-    // Download each QR code with a small delay
-    generatedQRCodes.forEach((qr, idx) => {
-        setTimeout(() => {
-            downloadQRCode(qr.index);
-            if (idx === generatedQRCodes.length - 1) {
-                showLoading(false);
-                showTemporaryMessage(`${generatedQRCodes.length} códigos QR descargados`, 'success');
+    try {
+        const zip = new JSZip();
+        const size = parseInt(document.getElementById('qr-size').value);
+        const colorDark = document.getElementById('qr-color').value;
+        const colorLight = document.getElementById('qr-bg-color').value;
+        
+        // Add each QR code as both PNG and SVG
+        let skippedCount = 0;
+        for (let i = 0; i < generatedQRCodes.length; i++) {
+            const qr = generatedQRCodes[i];
+            const qrDiv = document.getElementById(`qr-${qr.index}`);
+            const canvas = qrDiv ? qrDiv.querySelector('canvas') : null;
+            
+            if (canvas) {
+                // Add PNG version - extract base64 data by removing the data URL prefix
+                const pngData = canvas.toDataURL('image/png').split(',')[1];
+                zip.file(`qr-code-${i + 1}.png`, pngData, { base64: true });
+                
+                // Add SVG version
+                const svgContent = generateSVGQRCode(qr.link, size, colorDark, colorLight);
+                zip.file(`qr-code-${i + 1}.svg`, svgContent);
+            } else {
+                console.warn(`Canvas not found for QR code ${i + 1}, skipping`);
+                skippedCount++;
             }
-        }, idx * DOWNLOAD_DELAY_MS);
-    });
+        }
+        
+        // Show warning if some QR codes were skipped
+        if (skippedCount > 0) {
+            console.warn(`${skippedCount} QR code(s) were skipped due to missing canvas`);
+        }
+        
+        // Generate and download the ZIP file
+        const content = await zip.generateAsync({ type: 'blob' });
+        
+        // Check if FileSaver is available
+        if (typeof saveAs !== 'undefined') {
+            saveAs(content, 'qr-codes.zip');
+        } else {
+            // Fallback if FileSaver is not available
+            const url = URL.createObjectURL(content);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = 'qr-codes.zip';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+        }
+        
+        showLoading(false);
+        showTemporaryMessage(`${generatedQRCodes.length} códigos QR descargados en ZIP`, 'success');
+    } catch (error) {
+        console.error('Error al crear ZIP:', error);
+        showLoading(false);
+        alert('Error al crear el archivo ZIP');
+    }
 }
 
 // Function to clear all QR codes
