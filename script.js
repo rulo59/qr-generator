@@ -2,6 +2,14 @@
 
 // Complete QR Code Generation Functionality
 
+// Configuration constants
+const MAX_URL_DISPLAY_LENGTH = 50;
+const TRUNCATED_URL_LENGTH = 47;
+const LOADING_DISPLAY_DELAY_MS = 100;
+const DOWNLOAD_DELAY_MS = 300;
+const QR_CODES_PER_PAGE = 4;
+const MESSAGE_DISPLAY_DURATION_MS = 3000;
+
 // Store generated QR codes
 let generatedQRCodes = [];
 
@@ -90,7 +98,7 @@ function generateQRCode(links) {
             // Create URL display
             const urlText = document.createElement('div');
             urlText.className = 'text-xs text-gray-500 mb-3 text-center break-all max-w-full';
-            urlText.textContent = link.length > 50 ? link.substring(0, 47) + '...' : link;
+            urlText.textContent = link.length > MAX_URL_DISPLAY_LENGTH ? link.substring(0, TRUNCATED_URL_LENGTH) + '...' : link;
             qrItem.appendChild(urlText);
             
             // Create buttons container
@@ -147,7 +155,7 @@ function generateQRCode(links) {
             document.getElementById('download-all-btn').disabled = false;
             document.getElementById('print-btn').disabled = false;
         }
-    }, 100);
+    }, LOADING_DISPLAY_DELAY_MS);
 }
 
 // Function to download individual QR code as PNG
@@ -237,7 +245,7 @@ function downloadAllQRCodes() {
                 showLoading(false);
                 showTemporaryMessage(`${generatedQRCodes.length} códigos QR descargados`, 'success');
             }
-        }, idx * 300); // 300ms delay between downloads
+        }, idx * DOWNLOAD_DELAY_MS);
     });
 }
 
@@ -262,8 +270,8 @@ function printQRCodes() {
     const printContainer = document.getElementById('print-container');
     printContainer.innerHTML = '';
     
-    // Create pages with 4 QR codes each (2x2 grid)
-    const qrPerPage = 4;
+    // Create pages with QR codes in a grid layout
+    const qrPerPage = QR_CODES_PER_PAGE;
     const totalPages = Math.ceil(generatedQRCodes.length / qrPerPage);
     
     for (let page = 0; page < totalPages; page++) {
@@ -321,7 +329,7 @@ function showTemporaryMessage(message, type = 'success') {
     
     setTimeout(() => {
         messageDiv.remove();
-    }, 3000);
+    }, MESSAGE_DISPLAY_DURATION_MS);
 }
 
 // Setup event listeners when DOM is ready
