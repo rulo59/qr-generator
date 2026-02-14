@@ -228,31 +228,44 @@ function downloadQRCode(index, format = 'png') {
 
 // Function to generate SVG QR code
 function generateSVGQRCode(text, size, colorDark, colorLight) {
-    // Using a simple QR code generation approach for SVG
-    // We'll use the QRCode library's internal functionality
-    const qr = qrcode(0, 'H');
-    qr.addData(text);
-    qr.make();
-    
-    const moduleCount = qr.getModuleCount();
-    const cellSize = size / moduleCount;
-    
-    let svg = `<?xml version="1.0" encoding="UTF-8"?>`;
-    svg += `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">`;
-    svg += `<rect width="${size}" height="${size}" fill="${colorLight}"/>`;
-    
-    for (let row = 0; row < moduleCount; row++) {
-        for (let col = 0; col < moduleCount; col++) {
-            if (qr.isDark(row, col)) {
-                const x = col * cellSize;
-                const y = row * cellSize;
-                svg += `<rect x="${x}" y="${y}" width="${cellSize}" height="${cellSize}" fill="${colorDark}"/>`;
+    try {
+        // Using QRCode library's internal qrcode function for SVG generation
+        if (typeof qrcode === 'undefined') {
+            throw new Error('qrcode function not available');
+        }
+        
+        const qr = qrcode(0, 'H');
+        qr.addData(text);
+        qr.make();
+        
+        const moduleCount = qr.getModuleCount();
+        const cellSize = size / moduleCount;
+        
+        let svg = `<?xml version="1.0" encoding="UTF-8"?>`;
+        svg += `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">`;
+        svg += `<rect width="${size}" height="${size}" fill="${colorLight}"/>`;
+        
+        for (let row = 0; row < moduleCount; row++) {
+            for (let col = 0; col < moduleCount; col++) {
+                if (qr.isDark(row, col)) {
+                    const x = col * cellSize;
+                    const y = row * cellSize;
+                    svg += `<rect x="${x}" y="${y}" width="${cellSize}" height="${cellSize}" fill="${colorDark}"/>`;
+                }
             }
         }
+        
+        svg += '</svg>';
+        return svg;
+    } catch (error) {
+        console.error('Error generating SVG QR code:', error);
+        // Fallback: create a simple SVG with error message
+        return `<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
+    <rect width="${size}" height="${size}" fill="${colorLight}"/>
+    <text x="50%" y="50%" text-anchor="middle" font-size="12" fill="red">Error generando SVG</text>
+</svg>`;
     }
-    
-    svg += '</svg>';
-    return svg;
 }
 
 // Function to download all QR codes as ZIP
