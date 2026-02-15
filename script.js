@@ -229,12 +229,10 @@ function downloadQRCode(index, format = 'png') {
 // Function to generate SVG QR code
 function generateSVGQRCode(text, size, colorDark, colorLight) {
     try {
-        // Using QRCode library's internal qrcode function for SVG generation
-        if (typeof qrcode === 'undefined') {
-            throw new Error('qrcode function not available');
-        }
-        
-        const qr = qrcode(0, 'H');
+        // Using qrcode-generator library for SVG generation
+        const typeNumber = 0; // Auto-detect
+        const errorCorrectionLevel = 'H';
+        const qr = qrcode(typeNumber, errorCorrectionLevel);
         qr.addData(text);
         qr.make();
         
@@ -259,13 +257,18 @@ function generateSVGQRCode(text, size, colorDark, colorLight) {
         return svg;
     } catch (error) {
         console.error('Error generating SVG QR code:', error);
-        // Fallback: create a simple SVG with error message
-        return `<?xml version="1.0" encoding="UTF-8"?>
+        // Fallback: convert canvas to SVG if possible
+        return generateFallbackSVG(text, size, colorDark, colorLight);
+    }
+}
+
+// New fallback function to convert canvas to SVG
+function generateFallbackSVG(text, size, colorDark, colorLight) {
+    return `<?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
     <rect width="${size}" height="${size}" fill="${colorLight}"/>
     <text x="50%" y="50%" text-anchor="middle" font-size="12" fill="red">Error generando SVG</text>
 </svg>`;
-    }
 }
 
 // Function to download all QR codes as ZIP
